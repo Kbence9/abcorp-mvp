@@ -140,7 +140,7 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Áttekintés</TabsTrigger>
             <TabsTrigger value="roi">ROI Kalkulátor</TabsTrigger>
             <TabsTrigger value="profile">Cég profil szerkesztése</TabsTrigger>

@@ -50,6 +50,12 @@ export async function POST(req: Request) {
       npv += yearFlow / Math.pow(1 + discountRate, year)
     }
 
+    if (!body.total_capex || Number(body.total_capex) <= 0) {
+  return NextResponse.json({ error: 'Érvénytelen beruházási összeg' }, { status: 400 })
+}
+if (!body.revenue_growth || !body.cost_saving) {
+  return NextResponse.json({ error: 'Hiányzó bevétel/megtakarítás adatok' }, { status: 400 })
+}
     // 3. Eredmények mentése az adatbázisba
     const { data, error } = await supabase
       .from('roi_calculations')
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
         project_name: body.project_name,
         inputs: body, // JSONB mezőbe elmentjük az összes raw inputot
         result_npv: Math.round(npv),
-        result_roi: ((npv / capex) * 100).toFixed(2)
+        result_roi: parseFloat(((npv / capex) * 100).toFixed(2))
       })
       .select()
       .single()

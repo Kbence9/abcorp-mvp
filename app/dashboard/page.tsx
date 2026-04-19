@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import ROIForm from '@/components/ROIForm'
+import { FileSearch, BarChart2, FileText, User } from 'lucide-react'
 
 type Profile = {
   id: string
@@ -44,7 +45,6 @@ export default function Dashboard() {
           .eq('id', session.user.id)
           .single()
 
-        // Ha nincs profil, hozzunk létre egyet
         if (error && error.code === 'PGRST116') {
           const { error: insertError } = await supabase
             .from('profiles')
@@ -56,7 +56,6 @@ export default function Dashboard() {
 
           if (insertError) throw insertError
 
-          // Újra lekérjük
           const { data: newData } = await supabase
             .from('profiles')
             .select('*')
@@ -86,7 +85,7 @@ export default function Dashboard() {
     setSaving(true)
 
     const formData = new FormData(e.currentTarget)
-    
+
     const updates = {
       company_name: formData.get('company_name') as string,
       annual_revenue: formData.get('annual_revenue') ? parseInt(formData.get('annual_revenue') as string) : null,
@@ -143,47 +142,96 @@ export default function Dashboard() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Áttekintés</TabsTrigger>
             <TabsTrigger value="roi">ROI Kalkulátor</TabsTrigger>
-            <TabsTrigger value="profile">Cég profil szerkesztése</TabsTrigger>
+            <TabsTrigger value="profile">Cég profil</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Excel modellek */}
               <Card>
-                <CardHeader><CardTitle>Excel modellek</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5 text-blue-400" />
+                    Excel modellek
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <p className="text-zinc-400 mb-4">Futtasd a pénzügyi elemzéseket online</p>
-                  <Button className="w-full">Modell feltöltése / futtatása</Button>
+                  <p className="text-zinc-400 mb-4 text-sm">Futtasd a pénzügyi elemzéseket online</p>
+                  <Button className="w-full" variant="outline">Hamarosan elérhető</Button>
                 </CardContent>
               </Card>
+
+              {/* Pályázatok */}
               <Card>
-                <CardHeader><CardTitle>Pályázatok</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileSearch className="w-5 h-5 text-green-400" />
+                    Pályázatok
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <p className="text-zinc-400 mb-4">Ajánlott pályázatok és értesítők</p>
-                  <Button className="w-full">Pályázatok megtekintése</Button>
+                  <p className="text-zinc-400 mb-4 text-sm">Böngéssz az elérhető pályázatok között</p>
+                  <Button
+                    className="w-full"
+                    onClick={() => router.push('/palyazatok')}
+                  >
+                    Pályázatok megtekintése
+                  </Button>
                 </CardContent>
               </Card>
+
+              {/* Riportok */}
               <Card>
-                <CardHeader><CardTitle>Riportok</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-purple-400" />
+                    Riportok
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <p className="text-zinc-400 mb-4">Korábbi elemzések és PDF-ek</p>
-                  <Button className="w-full">Riportok megtekintése</Button>
+                  <p className="text-zinc-400 mb-4 text-sm">Korábbi elemzések és PDF-ek</p>
+                  <Button className="w-full" variant="outline">Hamarosan elérhető</Button>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Admin gyorslink */}
+            {profile.is_admin && (
+              <Card className="mt-6 bg-purple-950/30 border-purple-800/50">
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="font-medium text-purple-300">Admin: Pályázatok kezelése</p>
+                    <p className="text-sm text-zinc-500">Feltöltés, szerkesztés, törlés</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="border-purple-600/50 text-purple-400 hover:bg-purple-600/10"
+                    onClick={() => router.push('/palyazatok/admin')}
+                  >
+                    Kezelés →
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="roi" className="mt-6">
             <div className="max-w-4xl mx-auto">
-    <h2 className="text-2xl font-bold mb-4">Pályázati ROI Elemzés</h2>
-    <p className="text-zinc-400 mb-8">Töltse ki az adatokat a precíz pénzügyi előrejelzéshez. A számításokat biztonságos szerverünk végzi.</p>
-    <ROIForm />
-  </div>
+              <h2 className="text-2xl font-bold mb-4">Pályázati ROI Elemzés</h2>
+              <p className="text-zinc-400 mb-8">
+                Töltse ki az adatokat a precíz pénzügyi előrejelzéshez.
+              </p>
+              <ROIForm />
+            </div>
           </TabsContent>
 
           <TabsContent value="profile" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Cég adatok szerkesztése</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Cég adatok szerkesztése
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSaveProfile} className="space-y-6">

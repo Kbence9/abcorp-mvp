@@ -1,81 +1,79 @@
 # abcorp-mvp
 
-KKV-k számára készült **pénzügyi elemző és pályázatkezelő platform**.  
-Excel modellek online futtatása, pályázat kereső + értesítők, riport generálás.
+Pénzügyi elemző és pályázatkezelő webes platform kis- és középvállalkozásoknak.
+A cél: az Excelben vezetett pénzügyi modellek (pl. megtérülés-számítás) böngészőben
+futtatása, a pályázatok egy helyen kezelése, és az eredményekből riport készítése.
 
-**Tech stack:** Next.js 15 (App Router) + Supabase + TypeScript + Tailwind CSS
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Supabase (Postgres, Auth, Storage) · Tailwind CSS · shadcn/ui
 
-## Funkciók (MVP)
-- Excel sablonok feltöltése és online futtatása (import/export)
-- Pályázat kereső és automatikus értesítők
-- Eredményekből riport generálás (PDF)
-- Felhasználókezelés (regisztráció, cég adatok)
+## Státusz
 
-## Tech Stack Döntés
-- **Frontend + Backend**: Next.js 15 (App Router, Server Components)
-- **Adatbázis & Auth**: Supabase (Postgres, Auth, Storage, Realtime)
-- **Excel kezelés**: ExcelJS
-- **Riportok**: pdf-lib
-- **Styling**: Tailwind CSS + shadcn/ui (opcionális)
-- **Hosting**: Vercel (frontend) + Supabase
+Korai MVP (v0.0.6), aktív fejlesztés alatt.
 
-## Gyorsindítás
+| Funkció | Állapot |
+| --- | --- |
+| Regisztráció, bejelentkezés (Supabase Auth) | kész |
+| Felhasználói dashboard, cégprofil | kész |
+| ROI / megtérülés-számítás (`/api/calculate-roi`) | kész |
+| Pályázatok listázása, feltöltése (Supabase Storage) | kész |
+| Admin felület (`/admin`, `/palyazatok/admin`) | kész |
+| Excel-sablonok feltöltése és futtatása (ExcelJS) | tervezett |
+| PDF-riport generálás (pdf-lib) | tervezett |
+| Pályázat-értesítők | tervezett |
 
-### Előfeltételek
-- Node.js 20+
-- Supabase fiók (ingyenes)
+## Futtatás helyben
 
-### 1. Supabase projekt létrehozása
-1. Menj a [supabase.com](https://supabase.com) oldalra és hozz létre egy új projektet.
-2. Másold ki az URL-t és az anon/public kulcsot (Settings → API).
+**Előfeltételek:** Node.js 20+, egy Supabase-projekt (az ingyenes csomag elég).
 
-### 2. Projekt telepítése
 ```bash
-# Ha még nincs klónozva
 git clone https://github.com/Kbence9/abcorp-mvp.git
 cd abcorp-mvp
+npm install
+```
 
-# Next.js projekt létrehozása Supabase sablonnal (ajánlott)
-npx create-next-app@latest . --example with-supabase
+Hozz létre egy `.env.local` fájlt a projekt gyökerében (ez a fájl a `.gitignore` miatt
+nem kerül a repóba), és add meg benne a Supabase-projekted adatait
+(Supabase → Project Settings → API):
 
-# vagy ha már van alap Next.js, akkor manuálisan:
-npm install @supabase/supabase-js @supabase/ssr
+| Változó | Mi ez |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | a Supabase-projekt URL-je |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | a projekt publikus (anon) kulcsa |
 
-
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+Ezután:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Az alkalmazás a <http://localhost:3000> címen érhető el.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Supabase-oldali beállítás
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Az alkalmazás a következőket várja a Supabase-projektben:
 
-## Learn More
+- `profiles` tábla (felhasználói és cégadatok, `is_admin` mező az admin jogosultsághoz)
+- `roi_calculations` tábla (a mentett megtérülés-számítások)
+- `palyazatok` tábla és azonos nevű Storage bucket (a feltöltött pályázati anyagok)
 
-To learn more about Next.js, take a look at the following resources:
+## Parancsok
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Parancs | Mit csinál |
+| --- | --- |
+| `npm run dev` | fejlesztői szerver |
+| `npm run build` | éles build |
+| `npm run start` | az éles build futtatása |
+| `npm run lint` | ESLint |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Mappák
 
-## Deploy on Vercel
+```
+app/          oldalak és API-útvonalak (App Router)
+components/   React-komponensek (ROI-űrlap, pályázatlista, feltöltés, ui/)
+lib/supabase/ Supabase kliens (böngésző, szerver, middleware)
+middleware.ts munkamenet-frissítés és útvonalvédelem
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Licenc
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT, lásd [LICENSE](LICENSE).
